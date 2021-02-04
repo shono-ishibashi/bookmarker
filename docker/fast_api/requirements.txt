@@ -1,0 +1,7 @@
+fastapi
+aiofiles
+pymongo
+pytest
+python-dateutil
+setuptools
+uvicorn
