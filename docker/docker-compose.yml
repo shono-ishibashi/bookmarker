@@ -1,6 +1,18 @@
 version: "3.7"
 
 services:
+  web:
+    container_name: web
+    image: nginx
+    depends_on:
+      - fast_api
+      - mongodb
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - nginx-fastapi-network
   fast_api:
     container_name: fast_api
     build:
@@ -10,7 +22,7 @@ services:
     volumes:
       - ../fast_api:/app:cached
     ports:
-      - 8000:8000
+      - "8000:8000"
     tty: true
     environment:
       MONGO_DATABASE_NAME: mongodb
@@ -22,6 +34,8 @@ services:
     command: wait-for-it.sh mongo_db:27017 --timeout=30 -- uvicorn main:app --reload --host 0.0.0.0 --port 8000
     networks:
       - fastapi-mongo-network
+      - nginx-fastapi-network
+
 
   mongodb:
     container_name: mongo_db
@@ -31,8 +45,8 @@ services:
     build:
       dockerfile: ./mongo_db/Dockerfile
       context: ./
-    ports:
-      - 27017:27017
+    expose:
+      - 27017
     tty: true
     volumes:
       - ./mongo_db/db:/data/db
@@ -60,4 +74,6 @@ services:
 
 networks:
   fastapi-mongo-network:
+    driver: bridge
+  nginx-fastapi-network:
     driver: bridge

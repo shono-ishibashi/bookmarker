@@ -31,12 +31,11 @@ def convert_schema_to_dict(bookmark_schema: BookMarkSchema) -> dict:
 def fetch_bookmarks(user_id: str, search_words: List[str]) -> List[dict]:
     # 検索条件があれば、絞り込み
     # なければ全件取得
-    uniq_search_words = list(set(search_words))
-    if uniq_search_words:
+    if len(search_words) != 0:
         search_filter_array = []
         for search_word in search_words:
-            search_filter_array.append({'title': {'$regex': search_word}})
-            search_filter_array.append({'memo': {'$regex': search_word}})
+            search_filter_array.append({'title': {'$regex': search_word, "$options": "i"}})
+            search_filter_array.append({'memo': {'$regex': search_word, "$options": "i"}})
         search_filter_array.append({'tags': {'$in': search_words}})
         search_filter = {'$or': search_filter_array, "user_id": user_id}
         bookmarks = db.bookmarks.find(filter=search_filter)
