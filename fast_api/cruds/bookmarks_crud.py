@@ -37,7 +37,7 @@ def fetch_bookmarks(user_id: str, search_words: List[str]) -> List[dict]:
             search_filter_array.append({'title': {'$regex': search_word, "$options": "i"}})
             search_filter_array.append({'memo': {'$regex': search_word, "$options": "i"}})
         search_filter_array.append({'tags': {'$in': search_words}})
-        search_filter = {'$or': search_filter_array, "user_id": user_id}
+        search_filter = {"$and": [{'$or': search_filter_array}, {"user_id": user_id}]}
         bookmarks = db.bookmarks.find(filter=search_filter)
     else:
         bookmarks: Cursor = db.bookmarks.find({"user_id": user_id})
